@@ -2,6 +2,8 @@
 // middleware functions from `auth-middleware.js`. You will need them here!
 const express = require('express')
 const router = express.Router()
+const userModel = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 const {
   checkPasswordLength,
   checkUsernameFree,
@@ -33,7 +35,12 @@ const {
 
   router.post('/register', checkPasswordLength, 
   checkUsernameFree, (req, res, next) => {
-    res.json('register')
+    const {username, password} = req.body
+    const hash = bcrypt.hashSync(password, 8)
+    userModel.add({username, password: hash})
+    .then(newUser => {
+      res.status(201).json(newUser)
+    }).catch(next)
   })
 
 
@@ -54,7 +61,13 @@ const {
  */
 
   router.post('/login', checkUsernameExists, (req, res, next) => {
-    res.json('login')
+    const { password } = req.body
+    if(bcrypt.compareSync(password, req.user.password)){
+      req.session.user = req.user
+      res.json({ message: `Welcome ${req.user.username}`})
+    } else {
+      next({status: 401, message: "Invalid credentials" })
+    }
   })
 
 

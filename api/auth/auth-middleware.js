@@ -45,10 +45,10 @@ function restricted(req, res, next) {
   }
 */
 async function checkUsernameExists(req, res, next) {
-  const {username} = req.body
   try {
-    const users = await userModel.findBy({username: username})
+    const users = await userModel.findBy({username: req.body.username})
     if(users.length){
+      req.user = users[0];
       next()
     } else {
       next({status: 401, message: "Invalid credentials"})
