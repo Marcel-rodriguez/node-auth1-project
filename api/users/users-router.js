@@ -41,14 +41,6 @@ const {restricted} = require('../auth/auth-middleware')
     }).catch(next)
   });
 
-
-  router.post('/', (req, res, next) => {
-    userModel.add(req.body)
-    .then(newUser => {
-      res.status(201).json(newUser)
-    }).catch(next)
-  })
-
   router.delete('/:id', (req, res, next) => {
     userModel.remove(req.params.id)
     .then(deletedUser => {
